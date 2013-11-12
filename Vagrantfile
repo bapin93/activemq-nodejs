@@ -17,7 +17,7 @@ echo "Instalando openjdk-6..."
 sudo apt-get install openjdk-6-jdk -q -y --fix-missing
 
 echo "Instalando unzip e vim..."
-sudo apt-get install -y unzip vim vim-gtk mysql-server-5.5
+sudo apt-get install -y unzip vim vim-gtk
 sudo mkdir /opt/ips
 EOF
 
@@ -26,9 +26,10 @@ EOF
   config.vm.define :mq do |mq_config|
     mq_config.vm.hostname = "activemq-server"
     mq_config.vm.network :private_network, ip: "192.168.0.10"
-	mq_config.vm.network "forwarded_port", guest: 61613, host: 61613
-	mq_config.vm.network "forwarded_port", guest: 61616, host: 61616
-	mq_config.vm.network "forwarded_port", guest: 8161, host: 8161
+    mq_config.vm.network "forwarded_port", guest: 61613, host: 61613
+    mq_config.vm.network "forwarded_port", guest: 61616, host: 61616
+    mq_config.vm.network "forwarded_port", guest: 8161, host: 8161
+    mq_config.vm.network "forwarded_port", guest: 3306, host: 5555
 
     mq_config.vm.provider :virtualbox do |vb|
       vb.customize ["modifyvm", :id, "--memory", "1024", "--ioapic", "on"]
@@ -67,6 +68,7 @@ fi
 
 echo mysql-server mysql-server/root_password select "root" | debconf-set-selections
 echo mysql-server mysql-server/root_password_again select "root" | debconf-set-selections
+sudo apt-get install -y mysql-server
 mysql -u root -p"root" -e ";DROP DATABASE test;DROP USER ''@'localhost';CREATE DATABASE ipsmq;GRANT ALL ON ipsmq.* TO ipsmq@localhost IDENTIFIED BY 'ipsmq';GRANT ALL ON ipsmq.* TO ipsmq@'%' IDENTIFIED BY 'ipsmq'"
 sudo sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
 sudo service mysql restart
