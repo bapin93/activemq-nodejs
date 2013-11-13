@@ -1,5 +1,4 @@
-var sys = require('sys'),
-    stomp = require('stomp'),
+var stomp = require('stomp'),
     mysql = require('mysql');
 
 

@@ -64,10 +64,11 @@ if [ ! -e "/opt/ips/activemq" ]; then
     sudo chown vagrant.vagrant -Rf /opt/ips/activemq
     echo "export PATH=\\$PATH:/opt/ips/activemq/bin" | sudo tee -a /etc/profile.d/activemq.sh
     /opt/ips/activemq/bin/activemq setup $HOME/.activemq
+    /opt/ips/activemq/bin/activemq start
 fi
 
-echo mysql-server mysql-server/root_password select "root" | debconf-set-selections
-echo mysql-server mysql-server/root_password_again select "root" | debconf-set-selections
+echo mysql-server mysql-server/root_password select "root" | sudo debconf-set-selections
+echo mysql-server mysql-server/root_password_again select "root" | sudo debconf-set-selections
 sudo apt-get install -y mysql-server
 mysql -u root -p"root" -e ";DROP DATABASE test;DROP USER ''@'localhost';CREATE DATABASE ipsmq;GRANT ALL ON ipsmq.* TO ipsmq@localhost IDENTIFIED BY 'ipsmq';GRANT ALL ON ipsmq.* TO ipsmq@'%' IDENTIFIED BY 'ipsmq'"
 sudo sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
